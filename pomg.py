@@ -65,7 +65,7 @@ ball = Ball()
 class Paddle:
 	h = 80
 	w = 20
-	speed = 0.35*gamespeed
+	speed = 0.4*gamespeed
 	x, y = 0, 0
 	velmod = 0	# -1 for up, 1 for down, 0 for stop
 	score = 0
@@ -197,7 +197,7 @@ while play:
 	# control_keyboard(p2)
 	
 	## METHOD 2: RandomAI ##
-	def control_randomAI(p, randX, diff):
+	def control_RandomAI(p, randX, diff):
 	
 		# Add randomness to movement so ball's velocity is random
 		global drift_cap
@@ -218,10 +218,40 @@ while play:
 			p.y = court_bottom-p.h
 		
 	# Enter difficulty as 'Easy', 'Medium', 'Hard', or 'Perfect'
-	#control_randomAI(p1, rand1, 'Hard')
-	control_randomAI(p2, rand2, 'Medium')
+	#control_RandomAI(p1, rand1, 'Hard')
+	#control_RandomAI(p2, rand2, 'Medium')
 
+	## METHOD 3: RandomAI 2.0 ##
+	def control_RandomAI2(p, randX, diff):
+	
+		# Add randomness to movement so ball's velocity is random
+		global drift_cap
+		p.drift = p.drift + p.drift_sign*(randX.random()*0.2)
 		
+		if p.drift >= drift_cap[diff]*(p.h/2):
+			p.drift_sign = -1
+		if p.drift <= -drift_cap[diff]*(p.h/2):
+			p.drift_sign = 1	
+		# Randomly change direction of drift a certain percentage of the time.
+		if random.random() < 0.001*gamespeed:
+			p.drift_sign = -p.drift_sign
+		
+		if p.center()[1] < ball.y:
+			# move up
+			p.y = (p.y + p.speed)# + p.drift  # add randomness so ball's velocity is random
+		elif p.center()[1] > ball.y:
+			# move down
+			p.y = (p.y - p.speed)# + p.drift  # add randomness so ball's velocity is random
+		print(p.drift)
+		if (p.y <= court_top):
+			p.y = court_top
+		if (p.y+p.h >= court_bottom):
+			p.y = court_bottom-p.h
+	
+	# Enter difficulty as 'Easy', 'Medium', 'Hard', or 'Perfect'
+	#control_RandomAI2(p1, rand1, 'Easy')
+	#control_RandomAI2(p2, rand2, 'Perfect')
+			
 		
 	# Draw paddles
 	pygame.draw.rect(screen, white, (p1.x, p1.y, p1.w, p1.h))
